@@ -34,6 +34,5 @@ public class NIOInterruption {
         executorService.submit(new NIOBlocked(channel));
         executorService.execute(new NIOBlocked(channe2));
         executorService.shutdown();
-
     }
 }
