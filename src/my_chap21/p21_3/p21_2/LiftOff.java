@@ -21,6 +21,7 @@ public class LiftOff implements Runnable{
 		// TODO Auto-generated method stub
 		while (countDown-->0) {
 			System.out.println(status());
+			//让步
 			Thread.yield();
 		}
 		

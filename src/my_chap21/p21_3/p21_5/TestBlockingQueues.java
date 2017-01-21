@@ -5,22 +5,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import my_chap21.p21_3.p21_2.LiftOff;
 
 /**
  * 这个例子是使用了 BlockingQueue(接口) ,
- *     队列     : (queue)  LinkedBlockingQueue,ArrayBlockingQueue
- *     双段队列 : (deque)  LinkedBlockingDeque,ArrayBlockingDeque
- *
- *  BlockingQueue支持 生产-消费者 模式,当有时再唤醒,他更加方便,放进去直接执行(唤醒被封装在底层,
- *               简单的生产-消费者模式 则是需要唤醒操作),没有就阻塞,
- *
- *  SynchronousQueue( BQ的子类 ) :他不会为队列中元素维护储存空间,他维护一组线程,即:有任务马上交付处理
- *  用处: 当有足够多的消费者,并且总是有一个消费者准备好交付的工作时,才适合使用同步线程
- *
+ * 队列     : (queue)  LinkedBlockingQueue,ArrayBlockingQueue
+ * 双段队列 : (deque)  LinkedBlockingDeque,ArrayBlockingDeque
+ * <p>
+ * BlockingQueue支持 生产-消费者 模式,当有时再唤醒,他更加方便,放进去直接执行(唤醒被封装在底层,
+ * 简单的生产-消费者模式 则是需要唤醒操作),没有就阻塞,
+ * <p>
+ * SynchronousQueue( BQ的子类 ) :他不会为队列中元素维护储存空间,他维护一组线程,即:有任务马上交付处理
+ * 用处: 当有足够多的消费者,并且总是有一个消费者准备好交付的工作时,才适合使用同步线程
+ * <p>
  * Created by Benjious on 2017/1/9.
  */
 class LiftOffRunner implements Runnable {
@@ -42,15 +42,15 @@ class LiftOffRunner implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            LiftOff liftOff = null;
             try {
-                liftOff = rockets.take();
+                LiftOff liftOff = rockets.take();
+                liftOff.run();
             } catch (InterruptedException e) {
                 System.out.println("Waking from take()");
             }
-            liftOff.run();
-            System.out.println("Exiting LiftOffRunner");
         }
+        System.out.println("Exiting LiftOffRunner");
+
     }
 }
 
@@ -76,6 +76,8 @@ public class TestBlockingQueues {
         for (int i = 0; i < 5; i++) {
             offRunner.add(new LiftOff(5));
         }
+
+        //getKey()方法中涉及到IO(要我们输入东西到控制台),但我们输入完,线程中断继续执行
         getKey("Press 'Enter (" + msg + ")");
         thread.interrupt();
         System.out.println("Finished " + msg + " test");
@@ -83,9 +85,9 @@ public class TestBlockingQueues {
     }
 
     public static void main(String[] args) {
-        test("LinkedBlockingQueue",new LinkedBlockingDeque<LiftOff>());
-        test("ArrayBlockingQueue",new ArrayBlockingQueue<LiftOff>(3));
-        test("SynchronousQueue",new SynchronousQueue<LiftOff>());
+        test("LinkedBlockingQueue", new LinkedBlockingQueue<LiftOff>());
+        test("ArrayBlockingQueue", new ArrayBlockingQueue<LiftOff>(3));
+        test("SynchronousQueue", new SynchronousQueue<LiftOff>());
 
     }
 }
